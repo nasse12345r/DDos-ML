@@ -15,9 +15,10 @@ os.environ['OMP_NUM_THREADS'] = '1'
 import numpy as np
 import pandas as pd
 import joblib
+import sklearn
+import xgboost
 import logging
 import warnings
-from nfstream import NFStreamer
 
 # ─── FLASK CONFIGURATION ───────────────────────────────
 app = Flask(__name__)
@@ -113,6 +114,9 @@ def pcap_to_flows(pcap_path):
     try:
         if not os.path.exists(pcap_path):
             return None
+
+        # Lazy-load NFStreamer to prevent memory exhaustion (Page File errors) on Windows startup
+        from nfstream import NFStreamer
 
         # n_meters=1 disables multiprocessing in NFStream, which prevents memory spikes and process locks on Windows
         streamer = NFStreamer(

@@ -14,6 +14,15 @@ if %errorlevel% neq 0 (
     goto :EOF
 )
 
+:: Enforce correct Scikit-Learn version to prevent Joblib unpickling corruption
+echo Verifying Scikit-Learn version...
+py -m pip show scikit-learn | findstr /C:"Version: 1.6.1" >nul
+if %errorlevel% neq 0 (
+    echo Installing scikit-learn==1.6.1 to match model training environment...
+    py -m pip uninstall scikit-learn -y
+    py -m pip install scikit-learn==1.6.1
+)
+
 :: Fix OpenBLAS memory issue for Numpy/Scikit-Learn
 set OPENBLAS_NUM_THREADS=1
 set OMP_NUM_THREADS=1
